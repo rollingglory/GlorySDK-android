@@ -1,0 +1,100 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
+
+def buildString = { k -> "\"${k}\"" }
+
+
+android {
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.rollingglory.playground"
+        minSdkVersion 15
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            buildConfigField "String", "ENDPOINT_DEFAULT", buildString("http://google.com")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_AUTH", buildString("TOKEN")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_PLATFORM", buildString("TOKEN")
+
+            buildConfigField "String", "ENDPOINT_TWITTER", buildString("http://google.com")
+        }
+
+        staging {
+            buildConfigField "String", "ENDPOINT_DEFAULT", buildString("http://google.com")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_AUTH", buildString("TOKEN")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_PLATFORM", buildString("TOKEN")
+
+            buildConfigField "String", "ENDPOINT_TWITTER", buildString("http://google.com")
+        }
+
+
+        release {
+            buildConfigField "String", "ENDPOINT_DEFAULT", buildString("http://google.com")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_AUTH", buildString("TOKEN")
+            buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_PLATFORM", buildString("TOKEN")
+
+            buildConfigField "String", "ENDPOINT_TWITTER", buildString("http://google.com")
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha01'
+
+
+
+    //COPY START -----------------------------------------------------------------------------------
+    //org.jetbrains.kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    //io.reactivex.rxjava2
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.8'
+
+    //com.squareup.retrofit2
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.5.0'
+
+    //com.google.code.gson
+    implementation 'com.google.code.gson:gson:2.8.4'
+
+    //com.google.dagger
+    implementation 'com.google.dagger:dagger:2.22.1'
+    kapt 'com.google.dagger:dagger-compiler:2.22.1'
+    implementation 'com.google.dagger:dagger-android:2.22.1'
+    implementation 'com.google.dagger:dagger-android-support:2.22.1'
+    kapt 'com.google.dagger:dagger-android-processor:2.22.1'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2' //javax.annotation:jsr250-api:1.0 move to javax.annotation-api:1.3.2
+
+
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'com.google.android.material:material:1.0.0'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //COPY END -----------------------------------------------------------------------------------
+}
