@@ -193,25 +193,29 @@ class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> impl
 
 #### Presenter
 ~~~java
-class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> implements HomeDelegate{
-    @Inject HomePresenter homePresenter;
-    @Inject ActivityHomeBinding binding;
+ class HomePresenter extends PresenterGlory<HomeDelegate> {
 
+    @Inject
+    DefaultEndpoint defaultEndpoint;
 
-    @Override
-    public Builder onBuilder() {
-        return new Builder(R.layout.activity_home)
-                .setSupportToolbar(R.id.toolbar)
-                .presenterDelegate(this)
-                .presenter(new HomePresenter())
-                .inject(true);
-    }
+    @Inject
+    YtsEndpoint ytsEndpoint;
 
+    void requestCategory(){
 
+        defaultEndpoint.getCategory().enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if(response.isSuccessful()){
+                    getPresenterDelegate().sizeCategory(response.body().size());
+                }
+            }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+
+            }
+        });
     }
 }
 ~~~
