@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha01'
+    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha02'
 }
 ~~~
 
