@@ -1,11 +1,11 @@
 
-# Rolling Glory 
+## Rolling Glory 
 Rollingglory is Company or Creative Digital Media studio based in Bandung, Indonesia.
 
-# GlorySDK
+## GlorySDK
 GlorySDK is bundle API for Utility, Network, UI, Component and Architecture.
 
-# Quick Start 
+## Quick Start 
 
 #### Gradle Depedency
 
@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha01'
+    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha02'
 }
 ~~~
 
@@ -33,7 +33,7 @@ dependencies {
 </dependency>
 ~~~
 
-### Gradle Configuration App
+#### Gradle Configuration App
 ~~~gradle
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -85,7 +85,7 @@ android {
 }
 ~~~
 
-### Gradle Configuration Project
+#### Gradle Configuration Project
 ~~~gradle
 buildscript {
     ext.kotlin_version = 'x.x.xx'
@@ -108,24 +108,24 @@ buildscript {
 
 ~~~
 
-### Gradle Properties
+#### Gradle Properties
 ~~~gradle
 android.useAndroidX=true
 android.databinding.enableV2=true
 android.enableJetifier=true
 ~~~
-# Base GlorySDK
-### Arcithecture GlorySDK
+## Base GlorySDK
+#### Arcithecture GlorySDK
 | Class | Migration Of | Role |
 | ------ | ------ | ------ |
 |ApplicationGlory | Application | Application |
-| ActivityGlory<t1 extends ViewDataBinding, t2 extends PresenterGlory> | AppCompatActivity | Activity
+| ActivityGlory<t1 extends HeaderGlory.Factory,t2 extends ViewDataBinding,t3 extends PresenterGlory> | AppCompatActivity | Activity
 | PresenterGlory<t1 extends PresenterDelegateGlory> | - | Presenter|
 | PresenterDelegateGlory | - | Presenter Delegate |
-| ActivityModuleGlory<t1 extends ViewDataBinding, t2 extends ActivityGlory<t1,t3>, t3 extends PresenterGlory> | - | Provided Injection |
+| ActivityModuleGlory<t1 extends HeaderGlory.Factory,t2 extends ViewDataBinding, t3 extends PresenterGlory,t4 extends ActivityGlory<t1,t2,t3>> | - | Provided Injection |
 
 
-### Depedency Injection Support AndroidX
+#### Depedency Injection Support AndroidX
 | Class | Migration Of | Role |
 | ------ | ------ | ------ |
 | AndroidInjectionX | AndroidInjection | Injection
@@ -133,13 +133,18 @@ android.enableJetifier=true
 | HasFragmentInjectorX | HasFragmentInjector | Mark Fragment Has Inject |
 | HasPresenterInjectorX | - | Mark Presenter Has Inject |
 
-# Convention
-### Convention Package
+
+#### Header Factory
+Default Header factory **ToolbarHeader**,**TabHeader**,**BannerHeader** extends of **HeaderGlory.Factory**
+
+
+## Convention
+#### Convention Package
 com.sample.app
 - endpoint 
   > use for interface endpoint
 - di 
-  >use for configureation depedency injection
+  >use for configuration depedency injection
 - network
   - request
   - response
@@ -153,33 +158,38 @@ com.sample.app
 
 
 
-# Style
+## Style
+- ThemeGlory
+- ThemeGlory.NoActionBar
+- ThemeGlory.NoActionAndStatusBar
+- ThemeGlory.AppBarOverlay
+
+## Component
 *Comming Soon*
-# Component
+## Database
 *Comming Soon*
-# Database
+## Utils
 *Comming Soon*
-# Utils
-*Comming Soon*
-# Unit Test
+## Unit Test
 *Comming Soon*
 
-# Quick Implementation
+## Quick Implementation
 ## Architecture MVP
 #### Activity
 ~~~java
-class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> implements HomeDelegate{
+class HomeActivity extends ActivityGlory<HomeHeader,ActivityHomeBinding,HomePresenter> implements HomeDelegate{
 
     @Inject HomePresenter homePresenter;
     @Inject ActivityHomeBinding binding;
-    
+    @Inject HomeHeader header;
     @Override
     public Builder onBuilder() {
         return new Builder(R.layout.activity_home)
-                .setSupportToolbar(R.id.toolbar)
-                .presenterDelegate(this)
-                .presenter(new HomePresenter())
-                .inject(true);
+                    .setSupportToolbar(R.id.toolbar)
+                    .presenterDelegate(this)
+                    .presenter(new HomePresenter())
+                    .headerFactory(new HomeHeader(this))
+                    .inject(true);
     }
 
 
@@ -193,25 +203,29 @@ class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> impl
 
 #### Presenter
 ~~~java
-class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> implements HomeDelegate{
-    @Inject HomePresenter homePresenter;
-    @Inject ActivityHomeBinding binding;
+ class HomePresenter extends PresenterGlory<HomeDelegate> {
 
+    @Inject
+    DefaultEndpoint defaultEndpoint;
 
-    @Override
-    public Builder onBuilder() {
-        return new Builder(R.layout.activity_home)
-                .setSupportToolbar(R.id.toolbar)
-                .presenterDelegate(this)
-                .presenter(new HomePresenter())
-                .inject(true);
-    }
+    @Inject
+    YtsEndpoint ytsEndpoint;
 
+    void requestCategory(){
 
+        defaultEndpoint.getCategory().enqueue(new Callback<List<Category>>() {
+            @Override
+            public void onResponse(Call<List<Category>> call, Response<List<Category>> response) {
+                if(response.isSuccessful()){
+                    getPresenterDelegate().sizeCategory(response.body().size());
+                }
+            }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+            @Override
+            public void onFailure(Call<List<Category>> call, Throwable t) {
+
+            }
+        });
     }
 }
 ~~~
@@ -228,16 +242,109 @@ interface HomeDelegate extends PresenterDelegateGlory {
 #### Module Provided
 ~~~java
 @Module
-class HomeModule extends ActivityModuleGlory<ActivityHomeBinding,HomeActivity,HomePresenter> {
+class HomeModule extends ActivityModuleGlory<HomeHeader,ActivityHomeBinding,HomePresenter,HomeActivity>
 
     @Module
     public abstract class Bind{
 
     }
 }
-
 ~~~
 
+#### Custom Header Factory
+
+~~~java
+//HomeHeader.java
+class HomeHeader extends HeaderGlory.Factory {
+    Toolbar toolbar;
+    ImageView image;
+    public HomeHeader(Context context) {
+        super(context);
+    }
+
+    @Override
+    public AppBarLayout onCreateAppBarLayout(ViewGroup viewGroup) {
+        AppBarLayout appBarLayout = (AppBarLayout) LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.header_factory_home,viewGroup,false);
+
+        toolbar = appBarLayout.findViewById(com.rollingglory.glorysdk.R.id.toolbar);
+        image = appBarLayout.findViewById(R.id.image);
+        setAppBarLayout(appBarLayout);
+        setToolbar(toolbar);
+
+        return appBarLayout;
+    }
+
+    void setImage(@DrawableRes int resId){
+        image.setImageResource(resId);
+    }
+}
+~~~
+
+~~~xml
+ <!--header_factory_home.xml-->
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.appbar.AppBarLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:theme="@style/ThemeGlory.AppBarOverlay"
+
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="40dp"
+        android:layout_height="40dp" />
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/ThemeGlory.PopupOverlay" />
+
+</com.google.android.material.appbar.AppBarLayout>
+~~~
+
+~~~java
+ //HomeActivity.java
+class HomeActivity extends ActivityGlory<HomeHeader,ActivityHomeBinding,HomePresenter> implements HomeDelegate{
+
+
+    @Inject
+    HomeHeader header;
+
+    @Override
+    public Builder onBuilder() {
+        return new Builder(R.layout.activity_home)
+                .setSupportToolbar(R.id.toolbar)
+                .presenterDelegate(this)
+                .presenter(new HomePresenter())
+                .headerFactory(new HomeHeader(this))
+                .inject(true);
+    }
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+  
+        header.addMenu(new MenuGlory(0,"Setting"));
+        header.setOnMenuSelected(new OnMenuSelected() {
+            @Override
+            public boolean menuSelected(MenuItem menuItem) {
+                if(menuItem.getItemId() == 0){
+                    Toast.makeText(HomeActivity.this,menuItem.getTitle(),Toast.LENGTH_LONG).show();
+                }
+                return false;
+            }
+        });
+
+        header.setImage(R.drawable.ic_android);
+
+
+    }
+}
+
+~~~
 
 ### Other Information
 You can follow us at <https://rollingglory.com/>
