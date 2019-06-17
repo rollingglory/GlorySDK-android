@@ -39,7 +39,6 @@ android {
             buildConfigField "String", "ENDPOINT_DEFAULT", buildString("http://google.com")
             buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_AUTH", buildString("TOKEN")
             buildConfigField "String", "ENDPOINT_DEFAULT_TOKEN_PLATFORM", buildString("TOKEN")
-
             buildConfigField "String", "ENDPOINT_TWITTER", buildString("http://google.com")
 
             minifyEnabled false
@@ -55,8 +54,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha01'
-
+    implementation 'com.rollingglory:glorysdk-android:0.0.1-alpha02'
 
 
     //COPY START -----------------------------------------------------------------------------------

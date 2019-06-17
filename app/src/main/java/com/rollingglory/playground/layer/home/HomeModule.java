@@ -7,7 +7,7 @@ import com.rollingglory.playground.databinding.ActivityHomeBinding;
 import dagger.Module;
 
 @Module
-public class HomeModule extends ActivityModuleGlory<ActivityHomeBinding,HomeActivity,HomePresenter> {
+public class HomeModule extends ActivityModuleGlory<HomeHeader, ActivityHomeBinding,HomePresenter,HomeActivity> {
 
     @Module
     public abstract class Bind{

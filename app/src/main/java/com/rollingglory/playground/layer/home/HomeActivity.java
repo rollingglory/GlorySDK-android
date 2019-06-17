@@ -2,24 +2,28 @@ package com.rollingglory.playground.layer.home;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.rollingglory.glorysdk.layer.ActivityGlory;
+import com.rollingglory.glorysdk.layouts.menu.MenuGlory;
+import com.rollingglory.glorysdk.layouts.menu.OnMenuSelected;
 import com.rollingglory.playground.R;
 import com.rollingglory.playground.databinding.ActivityHomeBinding;
 
 import javax.inject.Inject;
 
-public class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresenter> implements HomeDelegate{
-
-
+public class HomeActivity extends ActivityGlory<HomeHeader, ActivityHomeBinding,HomePresenter> implements HomeDelegate{
 
     @Inject
-    HomePresenter homePresenter;
+    HomePresenter presenter;
 
     @Inject
     ActivityHomeBinding binding;
 
+    @Inject
+    HomeHeader header;
 
     @Override
     public Builder onBuilder() {
@@ -27,9 +31,9 @@ public class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresente
                 .setSupportToolbar(R.id.toolbar)
                 .presenterDelegate(this)
                 .presenter(new HomePresenter())
+                .headerFactory(new HomeHeader(this))
                 .inject(true);
     }
-
 
 
     @Override
@@ -38,24 +42,37 @@ public class HomeActivity extends ActivityGlory<ActivityHomeBinding,HomePresente
         binding.buttonCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.requestCategory();
+                presenter.requestCategory();
 
             }
         });
-
         binding.buttonCategoryDb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.requestCategoryDb();
+                presenter.requestCategoryDb();
             }
         });
 
         binding.buttonYtsTimeout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                homePresenter.requestYtsTimeout();
+                presenter.requestYtsTimeout();
             }
         });
+        header.addMenu(new MenuGlory(0,"Setting"));
+        header.setOnMenuSelected(new OnMenuSelected() {
+            @Override
+            public boolean menuSelected(MenuItem menuItem) {
+                if(menuItem.getItemId() == 0){
+                    Toast.makeText(HomeActivity.this,menuItem.getTitle(),Toast.LENGTH_LONG).show();
+                }
+                return false;
+            }
+        });
+
+        header.setImage(R.drawable.ic_android);
+
+
     }
 
 
