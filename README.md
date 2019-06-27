@@ -328,7 +328,7 @@ Use theme ThemeGlory.NoActionBar
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/ThemeGlory"
         android:name=".MainApplication">
 
         <activity
@@ -505,24 +505,23 @@ public class HomeModule extends ModuleActivityGlory {
 ~~~java
 class HomePresenter extends PresenterGlory<HomeDelegate> {
  void populateUser(){
-         new JobGloryRx().subscribe(new OnJobGloryRx<List<UserItem>>() {
+     new JobGloryRx().subscribe(new OnJobGloryRx<List<UserItem>>() {
+        @Override
+        public List<UserItem> onJob() throws IOException {
+            //todo job
+            return new ArrayList<>();
+        }
 
-            @Override
-            public List<UserItem> onJob() throws IOException {
-                //todo job
-                return new ArrayList<>();
-            }
+        @Override
+        public void onSuccess(List<UserItem> data) {
+            //todo success and update ui
+        }
 
-            @Override
-            public void onSuccess(List<UserItem> data) {
-                //todo success and update ui
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                //todo error
-            }
-        });
+        @Override
+        public void onError(Throwable e) {
+            //todo error
+        }
+    });
     }
 }
 ~~~
@@ -530,7 +529,7 @@ class HomePresenter extends PresenterGlory<HomeDelegate> {
 #### Implementation JobMultipleRxGlory
 ~~~java
 class HomePresenter extends PresenterGlory<HomeDelegate> {
-    
+   
     void populateAndFind(){
          new JobMultipleRxGlory().subscribe(new OnJobMultipleRxGlory<List<UserItem>,List<ResourceItem>,UserItem,ResourceItem>(){
 
